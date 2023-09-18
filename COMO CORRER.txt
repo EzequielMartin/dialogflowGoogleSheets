@@ -1,0 +1,7 @@
+en una terminal correr en vsc:
+
+node index
+
+Abrir otra terminal en vsc y correr:
+
+./ngrok start dialogflow
