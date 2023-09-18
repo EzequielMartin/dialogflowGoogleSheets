@@ -1,3 +1,7 @@
+para instalar dependencias:
+
+npm install
+
 en una terminal correr en vsc:
 
 node index
