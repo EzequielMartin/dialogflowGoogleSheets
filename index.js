@@ -1,26 +1,26 @@
-const express = require('express')
-const app = express()
-const { WebhookClient } = require("dialogflow-fulfillment")
+const express = require('express');
+const app = express();
+const { WebhookClient } = require("dialogflow-fulfillment");
 const {google} = require("googleapis");
 
 app.get('/', function (req, res) {
-  res.send('Webhook Online, Ya se puede usar desde Dialogflow')
-})
+  res.send('Webhook Online, Ya se puede usar desde Dialogflow');
+});
 
 app.post('/webhook',express.json() ,function (req, res) {
 
     const agent = new WebhookClient({ request: req, response: res });
-    console.log('Dialogflow Request headers: ' + JSON.stringify(req.headers));
-    console.log('Dialogflow Request body: ' + JSON.stringify(req.body));
+    //console.log('Dialogflow Request headers: ' + JSON.stringify(req.headers));
+    //console.log('Dialogflow Request body: ' + JSON.stringify(req.body));
     
     function welcome(agent) {
         agent.add(`Welcome to my agent!`);
-    }
+    };
     
     function fallback(agent) {
         agent.add(`I didn't understand`);
         agent.add(`I'm sorry, can you try again?`);
-    }
+    };
 
     const auth = new google.auth.GoogleAuth({
         
@@ -43,12 +43,14 @@ app.post('/webhook',express.json() ,function (req, res) {
 
     function encuesta(agent){
 
-        //console.log(agent.parameters);
+        console.log(agent.parameters);
 
         const tema = agent.parameters.tema;
         const respuesta = agent.parameters.respuesta;
         const anio = agent.parameters.anio;
         const email = agent.parameters.email;
+        const nombre = agent.parameters.nombre;
+        const propuesta = agent.parameters.propuesta;
 
         googleSheets.spreadsheets.values.append({
             auth,
@@ -57,20 +59,21 @@ app.post('/webhook',express.json() ,function (req, res) {
             valueInputOption: "USER_ENTERED",
             resource: {
                 values: [
-                    [tema, respuesta, anio, email]
+                    [nombre, tema, respuesta, anio, email, propuesta]
                 ]
             }
-        })
+        });
         
-    }
+        agent.end("");
+    };
     
     let intentMap = new Map();
     intentMap.set('Default Welcome Intent', welcome);
     intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('encuesta', encuesta);
     agent.handleRequest(intentMap);
-    })
+    });
 
 app.listen(3000, ()=>{
     console.log("Ejecutando webhook en puerto 3000");
-})
+});
