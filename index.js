@@ -69,5 +69,5 @@ app.post('/webhook',express.json() ,function (req, res) {
     })
 
 app.listen(3000, ()=>{
-    console.log("Ejecutando servidor en puerto 3000");
+    console.log("Ejecutando webhook en puerto 3000");
 })
