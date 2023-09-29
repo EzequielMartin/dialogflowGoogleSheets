@@ -42,6 +42,9 @@ app.post('/webhook',express.json() ,function (req, res) {
     const spreadsheetId = "1ewlyWHWESZdumyPc_Hiiq6VJNzkZNHqqpYOX--fkd5w";
 
     function encuesta(agent){
+
+        //console.log(agent.parameters);
+
         const tema = agent.parameters.tema;
         const respuesta = agent.parameters.respuesta;
         const anio = agent.parameters.anio;
