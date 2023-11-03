@@ -1,11 +1,12 @@
 const express = require('express');
 const { WebhookClient } = require("dialogflow-fulfillment");
 const {google} = require("googleapis");
+const data = require("./secrets.json")
 
 const app = express();
 
 app.get('/', function (req, res) {
-  res.send('<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script><df-messenger intent="WELCOME" chat-title="Pruebas" agent-id="0d1be57d-e009-4424-8a7f-496d4eceb7c3" language-code="es"></df-messenger>');
+    res.send('<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script><df-messenger intent="WELCOME" chat-title="Pruebas" agent-id="'+data.agent_id+'" language-code="es"></df-messenger>');
 });
 
 app.post('/webhook',express.json() ,function (req, res) {
@@ -20,7 +21,7 @@ app.post('/webhook',express.json() ,function (req, res) {
     //     agent.add(`I didn't understand`);
     //     agent.add(`I'm sorry, can you try again?`);
     // };
-
+    
     function encuestaTest(agent){
 
         const auth = new google.auth.GoogleAuth({
@@ -34,7 +35,7 @@ app.post('/webhook',express.json() ,function (req, res) {
             version: "v4",
             auth: client
         });
-        const spreadsheetId = "1ewlyWHWESZdumyPc_Hiiq6VJNzkZNHqqpYOX--fkd5w";
+        const spreadsheetId = data.spreadsheetencuestaTest;
 
         console.log(agent.parameters);
 
@@ -71,7 +72,7 @@ app.post('/webhook',express.json() ,function (req, res) {
             version: "v4",
             auth: client
         });
-        const spreadsheetId = "1bnLRBVfI-2tC40e75L-t76Hs-Eqj4rxcnlke9fQNkBw";
+        const spreadsheetId = data.spreadsheetencuestaGidas;
 
         console.log(agent.parameters);
 
