@@ -2,3 +2,4 @@ node_modules
 credentials.json
 ngrok.yml
 secrets.json
+.ngrok.exe.old
