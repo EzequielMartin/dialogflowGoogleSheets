@@ -1,6 +1,6 @@
 # Dialogflow y Google Sheets
 
-###### Integracion de Dialogflow y Google Sheets para almacenar las respuestas de una encuesta respondida a traves de un chatbot
+Integracion de Dialogflow y Google Sheets para almacenar las respuestas de una encuesta respondida a traves de un chatbot
 
 ## Como correr el Servidor Web
 
