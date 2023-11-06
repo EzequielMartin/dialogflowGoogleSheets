@@ -1,8 +1,8 @@
-#Dialogflow y Google Sheets
+# Dialogflow y Google Sheets
 
-######Integracion de Dialogflow y Google Sheets para almacenar las respuestas de una encuesta respondida a traves de un chatbot
+###### Integracion de Dialogflow y Google Sheets para almacenar las respuestas de una encuesta respondida a traves de un chatbot
 
-##Como correr el Servidor Web
+## Como correr el Servidor Web
 
 Bajar del drive, en la carpeta de la PS, los archivos "credentials.json", "ngrok.yml" y "secrets.json" y guardarlos en la carpeta del proyecto.
 
@@ -20,7 +20,7 @@ Luego abrir otra terminal y ejecutar:
 
 con "--config ./ngrok.yml" lo corro con la config que tengo en el archivo que esta en esta misma carpeta.
 
-##Como responder la encuesta y visualizar la respuesta
+## Como responder la encuesta y visualizar la respuesta
 
 Ingresar a la pagina web donde esta corriendo, en este caso es: https://relieved-lenient-cockatoo.ngrok-free.app/ y responder la encuesta.
 
