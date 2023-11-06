@@ -34,7 +34,8 @@ app.post('/webhook',express.json() ,function (req, res) {
     //     agent.add(`I'm sorry, can you try again?`);
     // };
 
-    //Esta funcion es la que fui armando mientras aprendia, no es la que estoy usando actualmente 
+    //Esta funcion es la que fui armando mientras aprendia, no es la que estoy usando actualmente
+    //Todos los comentarios del codigo los hago en la funcion encuestaGIDAS, definida despues de esta, ya que es una funcion similar a esta pero mas completa 
     function encuestaTest(agent){
 
         const auth = new google.auth.GoogleAuth({
@@ -73,7 +74,7 @@ app.post('/webhook',express.json() ,function (req, res) {
     //Funcion con la que asocio la encuesta, respondida a traves del chatbot, con google sheets
     function encuestaGidas(agent){
 
-        //Defino 
+        //Declaro una variable que voy a usar para autenticacion cuando uso la API de google sheets, para esto uso los datos que estan en credentials.json
         const auth = new google.auth.GoogleAuth({
             keyFile: "credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets"
@@ -83,13 +84,17 @@ app.post('/webhook',express.json() ,function (req, res) {
             version: "v4",
             auth: client
         });
+
+        //Guardo el id de la spreadsheet en una variable, esta la tomo del archivo secrets.json
         const spreadsheetId = secrets.spreadSheetEncuestaGidas;
 
+        //Muestro en la consola los parametros que me devuelve Dialogflow, para hacer debugging
         console.log(agent.parameters);
 
+        //Guardo cada parametro en una variable
         const nombre = agent.parameters.nombre;
         const apellido = agent.parameters.apellido;
-        const area = agent.parameters.area.join(",\n\n");
+        const area = agent.parameters.area.join(",\n\n");  //Algunos de estos parametros son Arrays, por lo que uso la funcion join() para convertirlos en Strings, ya que en las casillas de la spreadsheet no puedo guardar Arrays. El ",\n\n" que le paso como parametro al join() es para definir como separo cada elemento del Array una vez que los junto todos en un String, en mi caso los separo con una coma y despues dos saltos de linea (uno empieza una linea nueva y el otro deja una linea de espacio en blanco) para una mayor claridad en la lectura de la spreadsheet
         const areaSugerencia = agent.parameters.areaSugerencia;
         const disciplina = agent.parameters.disciplina.join(",\n\n");
         const disciplinaSugerencia = agent.parameters.disciplinaSugerencia;
@@ -103,6 +108,7 @@ app.post('/webhook',express.json() ,function (req, res) {
         const motivacion = agent.parameters.motivacion.join(",\n\n");
         const comoConociste = agent.parameters.comoConociste.join(",\n\n");
 
+        //Ejecuto una funcion de la API de googlesheets, en este caso es la funcion append() la cual me deja concatenar una fila a la spreasheet. Le paso como parametros la variable de autenticacion, el ID de la spreadsheet, la hoja de esa spreadsheet que voy a modificar (en mi caso se llama "encuesta"), la forma en la que se insertan los valores a la spreadsheet y por ultimo los datos que voy a guardar, estos datos van a ser un Array de Arrays, ya que podria concatenar mas de una fila a la misma vez, donde cada elemento del array va a ser uno de los parametros que me devuelve DialogFlow, separados con coma y en el orden en el que quiero que queden en la spreadsheet
         googleSheets.spreadsheets.values.append({
             auth,
             spreadsheetId,
@@ -118,6 +124,7 @@ app.post('/webhook',express.json() ,function (req, res) {
         agent.end("");
     };
     
+    //Aca mapeo/asocio las funciones definidas anteriormente a Intents de Dialogflow, para que se ejecuten cuando se ejecuta el Intent
     let intentMap = new Map();
 
     // intentMap.set('Default Welcome Intent', welcome);
