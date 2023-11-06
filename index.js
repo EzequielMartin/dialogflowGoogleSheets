@@ -11,7 +11,14 @@ const app = express();
 //Usando esta ruta voy a poder acceder al chatbot, esta va a ser, por ej: https://dominioejemplo.com/
 //Donde dominionejemplo.com va a ser el nombre de mi dominio.
 app.get('/', function (req, res) {
-    res.send(`<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script><df-messenger intent="WELCOME" chat-title="Pruebas" agent-id="${secrets.agentId}" language-code="es"></df-messenger><h1>Encuesta GIDAS</h1>`);
+    res.send(`<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
+    <df-messenger
+      intent="WELCOME"
+      chat-title="Pruebas"
+      agent-id="${secrets.agentId}"
+      language-code="es"
+    ></df-messenger>
+    <h1>Encuesta GIDAS</h1>`);
 });
 
 
