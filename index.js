@@ -1,18 +1,30 @@
 const express = require('express');
-const { WebhookClient } = require("dialogflow-fulfillment");
+const {WebhookClient} = require("dialogflow-fulfillment");
 const {google} = require("googleapis");
-const data = require("./secrets.json")
+const secrets = require("./secrets.json")
 
+//Defino el puerto en el que va a correr el servidor web y creo la aplicacion
+const port = 3000;
 const app = express();
 
+//Defino una ruta para las requests HTTP GET, con la que muestro el chatbot en una pagina web
+//Usando esta ruta voy a poder acceder al chatbot, esta va a ser, por ej: https://dominioejemplo.com/
+//Donde dominionejemplo.com va a ser el nombre de mi dominio.
 app.get('/', function (req, res) {
-    res.send('<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script><df-messenger intent="WELCOME" chat-title="Pruebas" agent-id="'+data.agent_id+'" language-code="es"></df-messenger>');
+    res.send(`<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script><df-messenger intent="WELCOME" chat-title="Pruebas" agent-id="${secrets.agentId}" language-code="es"></df-messenger><h1>Encuesta GIDAS</h1>`);
 });
 
+
+//Defino una ruta para las requests HTTP POST, con la que ejecuto funciones asociadas a los Intents
+//Esta ruta es la que debo definir en la ventana de Fullfilments de Dialogflow, ya que Dialogflow envia una request HTTP POST
+//Entonces la URL que voy a definir va a ser, por ej: https://dominioejemplo.com/webhook
+//Donde dominionejemplo.com va a ser el nombre de mi dominio.
 app.post('/webhook',express.json() ,function (req, res) {
 
     const agent = new WebhookClient({ request: req, response: res });
     
+    //Estas funciones vienen definidas a modo de ejemplo, las comento ya que no las voy a usar
+
     // function welcome(agent) {
     //     agent.add(`Welcome to my agent!`);
     // };
@@ -21,23 +33,20 @@ app.post('/webhook',express.json() ,function (req, res) {
     //     agent.add(`I didn't understand`);
     //     agent.add(`I'm sorry, can you try again?`);
     // };
-    
+
+    //Esta funcion es la que fui armando mientras aprendia, no es la que estoy usando actualmente 
     function encuestaTest(agent){
 
         const auth = new google.auth.GoogleAuth({
             keyFile: "credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets"
         });
-        //Create client instance for auth
         const client = auth.getClient();
-        //Create Instance of Google Sheets API
         const googleSheets = google.sheets({
             version: "v4",
             auth: client
         });
-        const spreadsheetId = data.spreadsheetencuestaTest;
-
-        console.log(agent.parameters);
+        const spreadsheetId = secrets.spreadSheetEncuestaTest;
 
         const tema = agent.parameters.tema;
         const respuesta = agent.parameters.respuesta;
@@ -61,8 +70,10 @@ app.post('/webhook',express.json() ,function (req, res) {
         agent.end("");
     };
 
+    //Funcion con la que asocio la encuesta, respondida a traves del chatbot, con google sheets
     function encuestaGidas(agent){
 
+        //Defino 
         const auth = new google.auth.GoogleAuth({
             keyFile: "credentials.json",
             scopes: "https://www.googleapis.com/auth/spreadsheets"
@@ -72,7 +83,7 @@ app.post('/webhook',express.json() ,function (req, res) {
             version: "v4",
             auth: client
         });
-        const spreadsheetId = data.spreadsheetencuestaGidas;
+        const spreadsheetId = secrets.spreadSheetEncuestaGidas;
 
         console.log(agent.parameters);
 
@@ -108,13 +119,16 @@ app.post('/webhook',express.json() ,function (req, res) {
     };
     
     let intentMap = new Map();
+
     // intentMap.set('Default Welcome Intent', welcome);
     // intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('encuestaTest', encuestaTest);
     intentMap.set('encuestaGidas', encuestaGidas);
+
     agent.handleRequest(intentMap);
     });
 
-app.listen(3000, ()=>{
-    console.log("Ejecutando webhook en puerto 3000");
+//Defino en que puerto va a estar escuchando el servidor web y hago un retorno en la consola para confirmar que esta funcionando
+app.listen(port, ()=>{
+    console.log(`Ejecutando servidor web en puerto ${port}`);
 });
