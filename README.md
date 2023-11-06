@@ -4,9 +4,9 @@ Integracion de Dialogflow y Google Sheets para almacenar las respuestas de una e
 
 ## Como correr el Servidor Web
 
-Bajar del drive, en la carpeta de la PS, los archivos "credentials.json", "ngrok.yml" y "secrets.json" y guardarlos en la carpeta del proyecto.
+Primero clonar el repositorio. Luego bajar del drive, en la carpeta de la PS, los archivos "credentials.json", "ngrok.yml" y "secrets.json" y guardarlos en la carpeta del proyecto.
 
-Para instalar dependencias:
+Para instalar dependencias, en una terminar ejecutar:
 
 ```
 npm install
