@@ -130,6 +130,46 @@ app.post('/webhook',express.json() ,function (req, res) {
 
         agent.end("");
     };
+
+    function encuestaSatisfaccion(agent){
+
+        //Declaro una variable que voy a usar para autenticacion cuando uso la API de google sheets, para esto uso los datos que estan en credentials.json
+        const auth = new google.auth.GoogleAuth({
+            keyFile: "credentials.json",
+            scopes: "https://www.googleapis.com/auth/spreadsheets"
+        });
+        const client = auth.getClient();
+        const googleSheets = google.sheets({
+            version: "v4",
+            auth: client
+        });
+
+        //Guardo el id de la spreadsheet en una variable, esta la tomo del archivo secrets.json
+        const spreadsheetId = secrets.spreadSheetEncuestaSatisfaccion;
+
+        //Muestro en la consola los parametros que me devuelve Dialogflow, para hacer debugging
+        console.log(agent.parameters);
+
+        //Guardo cada parametro en una variable
+        const pudimosResponder = agent.parameters.pudimosResponder;
+        const satisfaccion = agent.parameters.satisfaccion;
+        const sugerencia = agent.parameters.sugerencia;
+
+        //Ejecuto una funcion de la API de google sheets, en este caso es la funcion append() la cual me deja concatenar una fila a la spreasheet. Le paso como parametros la variable de autenticacion, el ID de la spreadsheet, la hoja de esa spreadsheet que voy a modificar (en mi caso se llama "encuesta"), la forma en la que se insertan los valores a la spreadsheet y por ultimo los datos que voy a guardar, estos datos van a ser un Array de Arrays, ya que podria concatenar mas de una fila a la misma vez, donde cada elemento del array va a ser uno de los parametros que me devuelve DialogFlow, separados con coma y en el orden en el que quiero que queden en la spreadsheet
+        googleSheets.spreadsheets.values.append({
+            auth,
+            spreadsheetId,
+            range: "encuesta",
+            valueInputOption: "USER_ENTERED",
+            resource: {
+                values: [
+                    [pudimosResponder, satisfaccion, sugerencia]
+                ]
+            }
+        });
+
+        agent.end("");
+    };
     
     //Aca mapeo/asocio las funciones definidas anteriormente a Intents de Dialogflow, para que se ejecuten cuando se ejecuta el Intent
     let intentMap = new Map();
@@ -138,6 +178,7 @@ app.post('/webhook',express.json() ,function (req, res) {
     // intentMap.set('Default Fallback Intent', fallback);
     intentMap.set('encuestaTest', encuestaTest);
     intentMap.set('encuestaGidas', encuestaGidas);
+    intentMap.set('encuestaSatisfaccion', encuestaSatisfaccion);
 
     agent.handleRequest(intentMap);
     });
