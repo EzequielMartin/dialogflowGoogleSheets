@@ -219,6 +219,9 @@ app.post('/webhook',express.json() ,function (req, res) {
 
     async function encuestaRecomendacionPython(agent){
         
+        //Necesito usar una promesa porque me tengo que asegurar que se ejecute el recomendador antes de enviar la respuesta al usuario
+        //Ya que el retorno del recomendador es parte de la respuesta
+
         let runPy = new Promise((resolve, reject) => {
 
             //Muestro en la consola los parametros que me devuelve Dialogflow, para hacer debugging
@@ -231,6 +234,7 @@ app.post('/webhook',express.json() ,function (req, res) {
             const analisis = agent.parameters.analisis;
             const diseno = agent.parameters.diseno;
                      
+            //Ejecuto el recomendador (hecho en python), le paso como argumento todos los parametros que recibo desde el chatbot
             const childPython = spawn(secrets.rutaPython, [secrets.rutaMain, ia, programacion, infraestructura, analisis, diseno]);
 
             childPython.stdout.on('data', (data)=>{
@@ -246,6 +250,7 @@ app.post('/webhook',express.json() ,function (req, res) {
         const nombre = agent.parameters.nombre;
         let respuesta
 
+        //Espero a que el recomendador se ejecute y almaceno la respuesta que retorna el recomendador
         await runPy
         .then((data) => {
             console.log(data.toString())
@@ -255,6 +260,7 @@ app.post('/webhook',express.json() ,function (req, res) {
             console.log(error);
         })
 
+        //Genero la respuesta al usuario
         agent.add("Muchas gracias "+nombre+".\n Por tus intereses te recomendamos el proyecto "+respuesta);
         agent.end("")
     }
