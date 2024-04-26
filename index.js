@@ -1,7 +1,8 @@
 const express = require('express');
 const {WebhookClient} = require("dialogflow-fulfillment");
 const {google} = require("googleapis");
-const secrets = require("./secrets.json")
+const secrets = require("./secrets.json");
+const {spawn} = require('child_process');
 
 //Defino el puerto en el que va a correr el servidor web y creo la aplicacion
 const port = 3000;
@@ -215,6 +216,48 @@ app.post('/webhook',express.json() ,function (req, res) {
 
         agent.end("");
     };
+
+    async function encuestaRecomendacionPython(agent){
+        
+        let runPy = new Promise((resolve, reject) => {
+
+            //Muestro en la consola los parametros que me devuelve Dialogflow, para hacer debugging
+            console.log(agent.parameters);
+                
+            //Guardo cada parametro en una variable
+            const ia = agent.parameters.ia;
+            const programacion = agent.parameters.programacion;
+            const infraestructura = agent.parameters.infraestructura;
+            const analisis = agent.parameters.analisis;
+            const diseno = agent.parameters.diseno;
+                     
+            const childPython = spawn(secrets.rutaPython, [secrets.rutaMain, ia, programacion, infraestructura, analisis, diseno]);
+
+            childPython.stdout.on('data', (data)=>{
+                    resolve(data)
+            })
+
+            childPython.stderr.on('data', (error)=>{
+                    reject(error)
+            })
+
+        })
+
+        const nombre = agent.parameters.nombre;
+        let respuesta
+
+        await runPy
+        .then((data) => {
+            console.log(data.toString())
+            respuesta = data.toString()
+        })
+        .catch((error) => {
+            console.log(error);
+        })
+
+        agent.add("Muchas gracias "+nombre+".\n Por tus intereses te recomendamos el proyecto "+respuesta);
+        agent.end("")
+    }
     
     //Aca mapeo/asocio las funciones definidas anteriormente a Intents de Dialogflow, para que se ejecuten cuando se ejecuta el Intent
     let intentMap = new Map();
@@ -225,6 +268,7 @@ app.post('/webhook',express.json() ,function (req, res) {
     intentMap.set('encuestaGidas', encuestaGidas);
     intentMap.set('encuestaSatisfaccion', encuestaSatisfaccion);
     intentMap.set('encuestaRecomendacion', encuestaRecomendacion);
+    intentMap.set('encuestaRecomendacionPython', encuestaRecomendacionPython);
 
     agent.handleRequest(intentMap);
     });
