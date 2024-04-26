@@ -219,8 +219,7 @@ app.post('/webhook',express.json() ,function (req, res) {
 
     async function encuestaRecomendacionPython(agent){
         
-        //Necesito usar una promesa porque me tengo que asegurar que se ejecute el recomendador antes de enviar la respuesta al usuario
-        //Ya que el retorno del recomendador es parte de la respuesta
+        //Necesito usar una promesa porque me tengo que asegurar que se ejecute el recomendador antes de enviar la respuesta al usuario, ya que el retorno del recomendador es parte de la respuesta
 
         let runPy = new Promise((resolve, reject) => {
 
@@ -250,7 +249,7 @@ app.post('/webhook',express.json() ,function (req, res) {
         const nombre = agent.parameters.nombre;
         let respuesta
 
-        //Espero a que el recomendador se ejecute y almaceno la respuesta que retorna el recomendador
+        //Espero a que el recomendador se ejecute y almaceno la respuesta
         await runPy
         .then((data) => {
             console.log(data.toString())
